@@ -16,6 +16,25 @@ class CanvasManager {
 		this.width = 900;
 		this.height = 1100;
 
+		// تسجيل الخطوط إذا كانت موجودة
+		try {
+
+			const fontPath = path.join(
+				process.cwd(),
+				"assets",
+				"fonts",
+				"arial.ttf"
+			);
+
+			if (fs.existsSync(fontPath)) {
+				GlobalFonts.registerFromPath(
+					fontPath,
+					"Arial"
+				);
+			}
+
+		} catch {}
+
 	}
 
 	async load(file) {
@@ -43,6 +62,14 @@ class CanvasManager {
 
 		const ctx = canvas.getContext("2d");
 
+		// تحسين الجودة
+		ctx.antialias = "subpixel";
+		ctx.patternQuality = "best";
+		ctx.quality = "best";
+		ctx.textDrawingMode = "path";
+		ctx.imageSmoothingEnabled = true;
+		ctx.imageSmoothingQuality = "high";
+
 		return {
 			canvas,
 			ctx
@@ -55,12 +82,10 @@ class CanvasManager {
 		ctx.fillStyle = color;
 
 		ctx.fillRect(
-
 			0,
 			0,
 			ctx.canvas.width,
 			ctx.canvas.height
-
 		);
 
 	}
@@ -73,113 +98,4 @@ class CanvasManager {
 		size = 32,
 		color = "#ffffff",
 		align = "left",
-		font = "Arial"
-	) {
-
-		ctx.font = `${size}px ${font}`;
-
-		ctx.fillStyle = color;
-
-		ctx.textAlign = align;
-
-		ctx.fillText(text, x, y);
-
-	}
-
-	roundRect(
-		ctx,
-		x,
-		y,
-		w,
-		h,
-		r,
-		color
-	) {
-
-		ctx.beginPath();
-
-		ctx.moveTo(x + r, y);
-
-		ctx.arcTo(x + w, y, x + w, y + h, r);
-
-		ctx.arcTo(x + w, y + h, x, y + h, r);
-
-		ctx.arcTo(x, y + h, x, y, r);
-
-		ctx.arcTo(x, y, x + w, y, r);
-
-		ctx.closePath();
-
-		ctx.fillStyle = color;
-
-		ctx.fill();
-
-	}
-
-	async drawImage(
-		ctx,
-		image,
-		x,
-		y,
-		w,
-		h
-	) {
-
-		const img = await loadImage(image);
-
-		ctx.drawImage(
-
-			img,
-
-			x,
-			y,
-			w,
-			h
-
-		);
-
-	}
-
-	async menuBackground(ctx) {
-
-		const backgrounds = await fs.readdir(
-
-			path.join(process.cwd(), "assets/menu")
-
-		);
-
-		if (!backgrounds.length)
-			return;
-
-		const random = backgrounds[
-			Math.floor(Math.random() * backgrounds.length)
-		];
-
-		const img = await loadImage(
-
-			path.join(
-				process.cwd(),
-				"assets/menu",
-				random
-			)
-
-		);
-
-		ctx.drawImage(
-
-			img,
-
-			0,
-			0,
-
-			ctx.canvas.width,
-
-			ctx.canvas.height
-
-		);
-
-	}
-
-}
-
-module.exports = new CanvasManager();
+		font = "
