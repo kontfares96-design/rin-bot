@@ -7,9 +7,14 @@ const Logger = require("../utils/logger");
 
 class CommandHandler {
 
+	static commands = new Map();
+
 	static async load() {
 
-		global.RIN.commands.clear();
+		this.commands.clear();
+
+		if (global.RIN && global.RIN.commands)
+			global.RIN.commands.clear();
 
 		const commandsPath = path.join(
 			process.cwd(),
@@ -28,10 +33,7 @@ class CommandHandler {
 
 				const command = require(file);
 
-				if (
-					!command ||
-					typeof command !== "object"
-				)
+				if (!command || typeof command !== "object")
 					continue;
 
 				if (!command.name) {
@@ -44,10 +46,7 @@ class CommandHandler {
 
 				}
 
-				if (
-					typeof command.execute !==
-					"function"
-				) {
+				if (typeof command.execute !== "function") {
 
 					Logger.warning(
 						`${command.name} لا يحتوي على execute()`
@@ -57,12 +56,9 @@ class CommandHandler {
 
 				}
 
-				const name =
-					command.name.toLowerCase();
+				const name = command.name.toLowerCase();
 
-				if (
-					global.RIN.commands.has(name)
-				) {
+				if (this.commands.has(name)) {
 
 					Logger.warning(
 						`الأمر ${name} مكرر`
@@ -74,24 +70,42 @@ class CommandHandler {
 
 				command.filePath = file;
 
-				global.RIN.commands.set(
-					name,
-					command
-				);
+				this.commands.set(name, command);
+
+				if (global.RIN && global.RIN.commands)
+					global.RIN.commands.set(name, command);
 
 				Logger.command(name);
 
 			}
 			catch (err) {
 
-				Logger.error(err.message);
+				Logger.error(
+					`${path.basename(file)} : ${err.stack || err.message}`
+				);
 
 			}
 
 		}
 
 		Logger.success(
-			`تم تحميل ${global.RIN.commands.size} أمر`
+			`تم تحميل ${this.commands.size} أمر`
+		);
+
+	}
+
+	static get(name) {
+
+		return this.commands.get(
+			String(name).toLowerCase()
+		);
+
+	}
+
+	static has(name) {
+
+		return this.commands.has(
+			String(name).toLowerCase()
 		);
 
 	}
