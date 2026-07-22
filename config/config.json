@@ -1,1 +1,57 @@
+{
+  "bot": {
+    "name": "RIN [🍓]",
+    "prefix": "/",
+    "version": "1.0.0",
+    "language": "ar",
+    "timezone": "Africa/Algiers",
+    "mode": "public",
+    "ownerName": "Fares"
+  },
 
+  "login": {
+    "stateFile": "./config/rinstate.json",
+    "autoLogin": true
+  },
+
+  "system": {
+    "autoRead": true,
+    "autoTyping": true,
+    "autoMarkRead": true,
+    "autoMarkDelivery": true,
+    "online": true
+  },
+
+  "menu": {
+    "commandsPerPage": 10,
+    "theme": "anime",
+    "background": "./assets/menu/background.jpg",
+    "footerImage": "./assets/menu/footer.gif"
+  },
+
+  "database": {
+    "users": "./database/users.json",
+    "groups": "./database/groups.json",
+    "settings": "./database/settings.json"
+  },
+
+  "security": {
+    "antiSpam": true,
+    "antiLink": true,
+    "antiBot": true,
+    "antiFlood": true
+  },
+
+  "features": {
+    "ai": true,
+    "anime": true,
+    "music": true,
+    "downloads": true,
+    "games": true,
+    "economy": false
+  },
+
+  "cache": {
+    "path": "./cache"
+  }
+}
