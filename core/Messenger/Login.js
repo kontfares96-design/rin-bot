@@ -9,8 +9,11 @@ const Logger = require("../../utils/logger");
 class Login {
 
 	constructor(config) {
+
 		this.config = config;
+
 		this.api = null;
+
 		this.connected = false;
 
 		this.statePath = path.join(
@@ -18,6 +21,7 @@ class Login {
 			"config",
 			"fbstate.json"
 		);
+
 	}
 
 	loadState() {
@@ -26,9 +30,18 @@ class Login {
 			throw new Error("لم يتم العثور على fbstate.json");
 		}
 
-		return JSON.parse(
-			fs.readFileSync(this.statePath, "utf8")
-		);
+		try {
+
+			return JSON.parse(
+				fs.readFileSync(this.statePath, "utf8")
+			);
+
+		}
+		catch {
+
+			throw new Error("fbstate.json غير صالح.");
+
+		}
 
 	}
 
@@ -42,11 +55,15 @@ class Login {
 	}
 
 	getAPI() {
+
 		return this.api;
+
 	}
 
 	isConnected() {
+
 		return this.connected;
+
 	}
 
 	async connect() {
@@ -59,26 +76,40 @@ class Login {
 
 			login(
 				{
-					appState,
-					listenEvents: true,
-					forceLogin: true,
-					selfListen: false,
-					autoMarkRead: false,
-					autoMarkDelivery: false,
-					updatePresence: false
+					appState
 				},
 				(err, api) => {
 
 					if (err) {
+
 						Logger.error(err.message);
+
 						return reject(err);
+
 					}
 
+					api.setOptions({
+
+						listenEvents: true,
+						forceLogin: true,
+						selfListen: false,
+						autoMarkRead: false,
+						autoMarkDelivery: false,
+						updatePresence: false,
+						online: true
+
+					});
+
 					this.api = api;
+
 					this.connected = true;
 
 					try {
-						this.saveState(api.getAppState());
+
+						this.saveState(
+							api.getAppState()
+						);
+
 					}
 					catch {}
 
@@ -104,9 +135,14 @@ class Login {
 				await this.api.logout();
 
 		}
-		catch {}
+		catch (err) {
+
+			Logger.error(err.message);
+
+		}
 
 		this.api = null;
+
 		this.connected = false;
 
 		Logger.warning("تم تسجيل الخروج.");
@@ -117,7 +153,7 @@ class Login {
 
 		await this.disconnect();
 
-		return this.connect();
+		return await this.connect();
 
 	}
 
