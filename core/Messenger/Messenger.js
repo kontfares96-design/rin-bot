@@ -24,17 +24,28 @@ class Messenger {
 		if (this.started)
 			return this.api;
 
-		Logger.system("بدء تشغيل Messenger...");
+		try {
 
-		this.api = await this.login.connect();
+			Logger.system("بدء تشغيل Messenger...");
 
-		this.started = true;
+			this.api = await this.login.connect();
 
-		this.startedAt = Date.now();
+			this.started = true;
 
-		Logger.success("Messenger جاهز.");
+			this.startedAt = Date.now();
 
-		return this.api;
+			Logger.success("Messenger جاهز.");
+
+			return this.api;
+
+		}
+		catch (err) {
+
+			Logger.error(err.message);
+
+			throw err;
+
+		}
 
 	}
 
@@ -43,7 +54,16 @@ class Messenger {
 		if (!this.started)
 			return;
 
-		await this.login.disconnect();
+		try {
+
+			await this.login.disconnect();
+
+		}
+		catch (err) {
+
+			Logger.error(err.message);
+
+		}
 
 		this.api = null;
 
@@ -59,7 +79,7 @@ class Messenger {
 
 		await this.stop();
 
-		return this.start();
+		return await this.start();
 
 	}
 
