@@ -1,47 +1,51 @@
 "use strict";
 
 const fs = require("fs");
-const path = require("path");
 
 const MenuBuilder = require("../../utils/MenuBuilder");
 
 module.exports = {
 
 	name: "help",
+
 	aliases: ["menu", "commands"],
 
-	description: "Show commands list",
+	version: "1.0.0",
+
+	description: "عرض قائمة الأوامر",
 
 	category: "system",
+
+	cooldown: 3,
 
 	async execute(ctx) {
 
 		try {
 
-			const commandHandler = ctx.client.commandHandler;
-
-			const allCommands = [...commandHandler.commands.keys()]
-
-				.sort((a, b) => a.localeCompare(b));
+			const allCommands = [
+				...ctx.client.commandHandler.commands.keys()
+			].sort();
 
 			const perPage = 10;
 
 			let page = 1;
 
-			if (ctx.args[0]) {
+			if (ctx.args.length) {
 
-				const p = parseInt(ctx.args[0]);
+				const input = parseInt(ctx.args[0]);
 
-				if (!isNaN(p) && p > 0)
-					page = p;
+				if (!isNaN(input))
+					page = input;
 
 			}
 
-			const totalPages = Math.ceil(
-
-				allCommands.length / perPage
-
+			const totalPages = Math.max(
+				1,
+				Math.ceil(allCommands.length / perPage)
 			);
+
+			if (page < 1)
+				page = 1;
 
 			if (page > totalPages)
 				page = totalPages;
@@ -49,49 +53,27 @@ module.exports = {
 			const start = (page - 1) * perPage;
 
 			const commands = allCommands.slice(
-
 				start,
-
 				start + perPage
-
 			);
 
-			const image = await MenuBuilder.build(
-
+			const imagePath = await MenuBuilder.build(
 				commands,
-
 				page,
-
 				totalPages
-
 			);
 
-			await ctx.sender.image(
+			await ctx.image(imagePath);
 
-				ctx.threadID,
-
-				image,
-
-				""
-
-			);
-
-			fs.unlink(image, () => {});
+			fs.unlink(imagePath, () => {});
 
 		}
-
 		catch (err) {
 
-			console.log(err);
+			console.error(err);
 
-			await ctx.sender.reply(
-
-				ctx.threadID,
-
-				ctx.messageID,
-
-				"❌ حدث خطأ أثناء إنشاء القائمة."
-
+			await ctx.reply(
+				"❌ حدث خطأ أثناء إنشاء قائمة الأوامر."
 			);
 
 		}
