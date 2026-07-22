@@ -1,1 +1,42 @@
-
+{
+  "name": "rin-bot",
+  "version": "1.0.0",
+  "description": "RIN [🍓] Professional Messenger Bot",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "restart": "npm install && npm start"
+  },
+  "keywords": [
+    "rin",
+    "messenger",
+    "facebook",
+    "bot",
+    "chatbot",
+    "goatbot"
+  ],
+  "author": "Fares",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@distube/ytdl-core": "^4.16.12",
+    "@napi-rs/canvas": "^0.1.72",
+    "axios": "^1.11.0",
+    "chalk": "^5.6.0",
+    "cheerio": "^1.1.2",
+    "express": "^5.1.0",
+    "form-data": "^4.0.4",
+    "fs-extra": "^11.3.2",
+    "gradient-string": "^3.0.0",
+    "mime-types": "^3.0.1",
+    "moment-timezone": "^0.6.0",
+    "node-fetch": "^2.7.0",
+    "node-schedule": "^2.1.1",
+    "qrcode": "^1.5.4",
+    "uuid": "^11.1.0"
+  }
+}
