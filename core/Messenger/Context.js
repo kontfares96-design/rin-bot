@@ -6,6 +6,12 @@ class Context {
 
 		this.api = data.api || null;
 
+		this.sender = data.sender || null;
+
+		this.client = data.client || null;
+
+		this.config = data.config || null;
+
 		this.event = data.event || null;
 
 		this.body = data.body || "";
@@ -32,6 +38,13 @@ class Context {
 
 	async reply(body) {
 
+		if (this.sender)
+			return this.sender.reply(
+				this.threadID,
+				this.messageID,
+				body
+			);
+
 		return new Promise((resolve, reject) => {
 
 			this.api.sendMessage(
@@ -54,6 +67,12 @@ class Context {
 
 	async send(body) {
 
+		if (this.sender)
+			return this.sender.send(
+				this.threadID,
+				body
+			);
+
 		return new Promise((resolve, reject) => {
 
 			this.api.sendMessage(
@@ -73,7 +92,52 @@ class Context {
 
 	}
 
+	async image(imagePath, body = "") {
+
+		if (!this.sender)
+			throw new Error("Sender غير موجود");
+
+		return this.sender.image(
+			this.threadID,
+			imagePath,
+			body
+		);
+
+	}
+
+	async video(videoPath, body = "") {
+
+		if (!this.sender)
+			throw new Error("Sender غير موجود");
+
+		return this.sender.video(
+			this.threadID,
+			videoPath,
+			body
+		);
+
+	}
+
+	async audio(audioPath, body = "") {
+
+		if (!this.sender)
+			throw new Error("Sender غير موجود");
+
+		return this.sender.audio(
+			this.threadID,
+			audioPath,
+			body
+		);
+
+	}
+
 	async react(emoji) {
+
+		if (this.sender)
+			return this.sender.react(
+				this.messageID,
+				emoji
+			);
 
 		return new Promise((resolve, reject) => {
 
@@ -96,6 +160,11 @@ class Context {
 	}
 
 	async unsend() {
+
+		if (this.sender)
+			return this.sender.unsend(
+				this.messageID
+			);
 
 		return new Promise((resolve, reject) => {
 
