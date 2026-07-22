@@ -16,25 +16,29 @@ class Login {
 		this.statePath = path.join(
 			process.cwd(),
 			"config",
-			"rinstate.json"
+			"fbstate.json"
 		);
 	}
 
 	loadState() {
+
 		if (!fs.existsSync(this.statePath)) {
-			throw new Error("لم يتم العثور على rinstate.json");
+			throw new Error("لم يتم العثور على fbstate.json");
 		}
 
 		return JSON.parse(
 			fs.readFileSync(this.statePath, "utf8")
 		);
+
 	}
 
 	saveState(appState) {
+
 		fs.writeFileSync(
 			this.statePath,
 			JSON.stringify(appState, null, 2)
 		);
+
 	}
 
 	getAPI() {
@@ -74,17 +78,19 @@ class Login {
 					this.connected = true;
 
 					try {
-						const newState = api.getAppState();
-						this.saveState(newState);
-					} catch {}
+						this.saveState(api.getAppState());
+					}
+					catch {}
 
 					Logger.success("تم تسجيل الدخول بنجاح.");
 
 					resolve(api);
+
 				}
 			);
 
 		});
+
 	}
 
 	async disconnect() {
@@ -93,19 +99,26 @@ class Login {
 			return;
 
 		try {
+
 			if (typeof this.api.logout === "function")
 				await this.api.logout();
-		} catch {}
+
+		}
+		catch {}
 
 		this.api = null;
 		this.connected = false;
 
 		Logger.warning("تم تسجيل الخروج.");
+
 	}
 
 	async reconnect() {
+
 		await this.disconnect();
+
 		return this.connect();
+
 	}
 
 }
