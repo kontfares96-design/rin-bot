@@ -19,15 +19,20 @@ const Sender = require("./core/Messenger/Sender");
 	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
 	console.log(chalk.white.bold(`🍓 ${config.bot.name}`));
 	console.log(chalk.gray(`Version : ${config.bot.version}`));
-	console.log(chalk.gray(`Prefix : ${config.bot.prefix}`));
-	console.log(chalk.gray(`Language : ${config.bot.language}`));
+	console.log(chalk.gray(`Prefix  : ${config.bot.prefix}`));
+	console.log(chalk.gray(`Language: ${config.bot.language}`));
 	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
 
 	global.RIN = {
 		config,
 		startTime: Date.now(),
 		commands: new Map(),
-		events: new Map()
+		events: new Map(),
+		api: null,
+		messenger: null,
+		listener: null,
+		router: null,
+		sender: null
 	};
 
 	try {
@@ -56,14 +61,29 @@ const Sender = require("./core/Messenger/Sender");
 			eventHandler: EventHandler
 		});
 
+		global.RIN.api = api;
+		global.RIN.messenger = messenger;
+		global.RIN.listener = listener;
+		global.RIN.router = router;
+		global.RIN.sender = sender;
+
 		listener.on("message", async (event) => {
 			await router.handle(event);
+		});
+
+		listener.on("event", async (event) => {
+			if (EventHandler.handle)
+				await EventHandler.handle(event);
+		});
+
+		listener.on("error", (err) => {
+			console.error(chalk.red(err));
 		});
 
 		listener.start();
 
 		console.log(chalk.green("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
-		console.log(chalk.green("RIN [🍓] Online Successfully"));
+		console.log(chalk.green("🍓 RIN [🍓] Online Successfully"));
 		console.log(chalk.yellow(`Commands : ${global.RIN.commands.size}`));
 		console.log(chalk.yellow(`Events   : ${global.RIN.events.size}`));
 		console.log(chalk.green("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
@@ -71,7 +91,7 @@ const Sender = require("./core/Messenger/Sender");
 	}
 	catch (err) {
 
-		console.error(err);
+		console.error(chalk.red(err.stack || err));
 
 		process.exit(1);
 
