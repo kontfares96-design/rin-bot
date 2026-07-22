@@ -1,7 +1,6 @@
 "use strict";
 
 const chalk = require("chalk");
-
 const config = require("./config/config.json");
 
 const CommandHandler = require("./handlers/commandHandler");
@@ -13,29 +12,27 @@ const Router = require("./core/Messenger/Router");
 const Sender = require("./core/Messenger/Sender");
 
 (async () => {
-
-	console.clear();
-
-	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
-	console.log(chalk.white.bold(`🍓 ${config.bot.name}`));
-	console.log(chalk.gray(`Version : ${config.bot.version}`));
-	console.log(chalk.gray(`Prefix  : ${config.bot.prefix}`));
-	console.log(chalk.gray(`Language: ${config.bot.language}`));
-	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
-
-	global.RIN = {
-		config,
-		startTime: Date.now(),
-		commands: new Map(),
-		events: new Map(),
-		api: null,
-		messenger: null,
-		listener: null,
-		router: null,
-		sender: null
-	};
-
 	try {
+		console.clear();
+
+		console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+		console.log(chalk.white.bold(`🍓 ${config.bot.name}`));
+		console.log(chalk.gray(`Version : ${config.bot.version}`));
+		console.log(chalk.gray(`Prefix  : ${config.bot.prefix}`));
+		console.log(chalk.gray(`Language: ${config.bot.language}`));
+		console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+
+		global.RIN = {
+			config,
+			startTime: Date.now(),
+			commands: new Map(),
+			events: new Map(),
+			api: null,
+			messenger: null,
+			listener: null,
+			router: null,
+			sender: null
+		};
 
 		console.log(chalk.cyan("Loading Commands..."));
 		await CommandHandler.load();
@@ -46,11 +43,9 @@ const Sender = require("./core/Messenger/Sender");
 		console.log(chalk.cyan("Connecting Facebook..."));
 
 		const messenger = new Messenger(config);
-
 		const api = await messenger.start();
 
 		const sender = new Sender(api);
-
 		const listener = new Listener(api);
 
 		const router = new Router({
@@ -72,8 +67,9 @@ const Sender = require("./core/Messenger/Sender");
 		});
 
 		listener.on("event", async (event) => {
-			if (EventHandler.handle)
+			if (EventHandler.handle) {
 				await EventHandler.handle(event);
+			}
 		});
 
 		listener.on("error", (err) => {
@@ -88,13 +84,8 @@ const Sender = require("./core/Messenger/Sender");
 		console.log(chalk.yellow(`Events   : ${global.RIN.events.size}`));
 		console.log(chalk.green("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
 
-	}
-	catch (err) {
-
-		console.error(chalk.red(err.stack || err));
-
+	} catch (err) {
+		console.error(err);
 		process.exit(1);
-
 	}
-
 })();
