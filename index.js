@@ -1,65 +1,77 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-
 const chalk = require("chalk");
+
+const config = require("./config/config.json");
 
 const CommandHandler = require("./handlers/commandHandler");
 const EventHandler = require("./handlers/eventHandler");
 
-const config = require("./config/config.json");
+const Messenger = require("./core/Messenger/Messenger");
+const Listener = require("./core/Messenger/Listener");
+const Router = require("./core/Messenger/Router");
+const Sender = require("./core/Messenger/Sender");
 
-console.clear();
+(async () => {
 
-console.log(
-	chalk.hex("#ff4fa3")("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-);
-console.log(
-	chalk.white.bold(`🍓 ${config.bot.name}`)
-);
-console.log(
-	chalk.gray(`Version : ${config.bot.version}`)
-);
-console.log(
-	chalk.gray(`Language : ${config.bot.language}`)
-);
-console.log(
-	chalk.gray(`Timezone : ${config.bot.timezone}`)
-);
-console.log(
-	chalk.hex("#ff4fa3")("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-);
+	console.clear();
 
-global.RIN = {
-	config,
-	startTime: Date.now(),
-	commands: new Map(),
-	events: new Map()
-};
+	console.log(
+		chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	);
 
-async function bootstrap() {
+	console.log(
+		chalk.white.bold(`🍓 ${config.bot.name}`)
+	);
 
-	try {
+	console.log(
+		chalk.gray(`Version : ${config.bot.version}`)
+	);
 
-		console.log(
-			chalk.cyan("➜ Loading Commands...")
-		);
+	console.log(
+		chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	);
 
-		await CommandHandler.load();
+	global.RIN = {
+		config
+	};
 
-		console.log(
-			chalk.cyan("➜ Loading Events...")
-		);
+	await CommandHandler.load();
 
-		await EventHandler.load();
+	await EventHandler.load();
 
-		console.log(
-			chalk.green("✔ Framework Ready")
-		);
+	const messenger = new Messenger(config);
 
-		console.log("");
+	const api = await messenger.start();
 
-		console.log(
-			chalk.yellow(
-				`Commands : ${global.RIN.commands.size
+	const sender = new Sender(api);
+
+	const listener = new Listener(api);
+
+	const router = new Router({
+
+		api,
+
+		sender,
+
+		config,
+
+		commandHandler: CommandHandler,
+
+		eventHandler: EventHandler
+
+	});
+
+	listener.on("message", event => {
+
+		router.handle(event);
+
+	});
+
+	listener.start();
+
+	console.log(
+		chalk.green("✅ RIN Started Successfully")
+	);
+
+})();
