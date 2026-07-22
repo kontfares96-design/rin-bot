@@ -26,91 +26,69 @@ class Listener extends EventEmitter {
 
 		Logger.system("بدء الاستماع للرسائل...");
 
-		this.stopListening = this.api.listenMqtt(
-			(err, event) => {
+		this.stopListening = this.api.listenMqtt((err, event) => {
 
-				if (err) {
+			if (err) {
 
-					Logger.error(err.message);
+				Logger.error(err.message);
 
-					this.emit("error", err);
+				this.emit("error", err);
 
-					return;
-
-				}
-
-				if (!event)
-					return;
-
-				switch (event.type) {
-
-					case "message":
-					case "message_reply":
-
-						this.emit(
-							"message",
-							event
-						);
-
-						break;
-
-					case "message_reaction":
-
-						this.emit(
-							"reaction",
-							event
-						);
-
-						break;
-
-					case "message_unsend":
-
-						this.emit(
-							"unsend",
-							event
-						);
-
-						break;
-
-					case "event":
-
-						this.emit(
-							"event",
-							event
-						);
-
-						break;
-
-					case "typ":
-
-						this.emit(
-							"typing",
-							event
-						);
-
-						break;
-
-					case "presence":
-
-						this.emit(
-							"presence",
-							event
-						);
-
-						break;
-
-					default:
-
-						this.emit(
-							"unknown",
-							event
-						);
-
-				}
+				return;
 
 			}
 
-		);
+			if (!event)
+				return;
+
+			this.emit(event.type, event);
+
+			switch (event.type) {
+
+				case "message":
+				case "message_reply":
+
+					this.emit("message", event);
+
+					break;
+
+				case "message_reaction":
+
+					this.emit("reaction", event);
+
+					break;
+
+				case "message_unsend":
+
+					this.emit("unsend", event);
+
+					break;
+
+				case "event":
+
+					this.emit("event", event);
+
+					break;
+
+				case "typ":
+
+					this.emit("typing", event);
+
+					break;
+
+				case "presence":
+
+					this.emit("presence", event);
+
+					break;
+
+				default:
+
+					this.emit("unknown", event);
+
+			}
+
+		});
 
 		Logger.success("Listener يعمل.");
 
