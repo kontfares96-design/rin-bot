@@ -16,62 +16,65 @@ const Sender = require("./core/Messenger/Sender");
 
 	console.clear();
 
-	console.log(
-		chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	);
-
-	console.log(
-		chalk.white.bold(`🍓 ${config.bot.name}`)
-	);
-
-	console.log(
-		chalk.gray(`Version : ${config.bot.version}`)
-	);
-
-	console.log(
-		chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	);
+	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+	console.log(chalk.white.bold(`🍓 ${config.bot.name}`));
+	console.log(chalk.gray(`Version : ${config.bot.version}`));
+	console.log(chalk.gray(`Prefix : ${config.bot.prefix}`));
+	console.log(chalk.gray(`Language : ${config.bot.language}`));
+	console.log(chalk.magenta("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
 
 	global.RIN = {
-		config
+		config,
+		startTime: Date.now(),
+		commands: new Map(),
+		events: new Map()
 	};
 
-	await CommandHandler.load();
+	try {
 
-	await EventHandler.load();
+		console.log(chalk.cyan("Loading Commands..."));
+		await CommandHandler.load();
 
-	const messenger = new Messenger(config);
+		console.log(chalk.cyan("Loading Events..."));
+		await EventHandler.load();
 
-	const api = await messenger.start();
+		console.log(chalk.cyan("Connecting Facebook..."));
 
-	const sender = new Sender(api);
+		const messenger = new Messenger(config);
 
-	const listener = new Listener(api);
+		const api = await messenger.start();
 
-	const router = new Router({
+		const sender = new Sender(api);
 
-		api,
+		const listener = new Listener(api);
 
-		sender,
+		const router = new Router({
+			api,
+			sender,
+			config,
+			commandHandler: CommandHandler,
+			eventHandler: EventHandler
+		});
 
-		config,
+		listener.on("message", async (event) => {
+			await router.handle(event);
+		});
 
-		commandHandler: CommandHandler,
+		listener.start();
 
-		eventHandler: EventHandler
+		console.log(chalk.green("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
+		console.log(chalk.green("RIN [🍓] Online Successfully"));
+		console.log(chalk.yellow(`Commands : ${global.RIN.commands.size}`));
+		console.log(chalk.yellow(`Events   : ${global.RIN.events.size}`));
+		console.log(chalk.green("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
 
-	});
+	}
+	catch (err) {
 
-	listener.on("message", event => {
+		console.error(err);
 
-		router.handle(event);
+		process.exit(1);
 
-	});
-
-	listener.start();
-
-	console.log(
-		chalk.green("✅ RIN Started Successfully")
-	);
+	}
 
 })();
